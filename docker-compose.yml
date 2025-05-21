@@ -1,0 +1,40 @@
+services:
+    db:
+        image: postgres:15-alpine
+        container_name: dimdim-db
+        restart: always
+        environment:
+            POSTGRES_DB: dimdim
+            POSTGRES_USER: dimdim_user
+            POSTGRES_PASSWORD: dimdim_pass
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        networks:
+            - dimdim-net
+
+    app:
+        build:
+            context: .
+            dockerfile: ./app/Dockerfile
+        container_name: dimdim-app
+        restart: always
+        depends_on:
+            - db
+        environment:
+            DB_HOST: db
+            DB_PORT: 5432
+            DB_NAME: dimdim
+            DB_USER: dimdim_user
+            DB_PASS: dimdim_pass
+            PORT: 3000
+        ports:
+            - "3000:3000"
+        networks:
+            - dimdim-net
+
+volumes:
+    db_data:
+
+networks:
+    dimdim-net:
+        driver: bridge
