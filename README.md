@@ -1,34 +1,39 @@
-# Projeto DimDim App
+# 🚀 Projeto DimDim App
 
 Este repositório contém um ambiente Docker com dois containers:
 
--   **db**: PostgreSQL com volume nomeado para persistência de dados.
--   **app**: API Node.js com Express e PostgreSQL, rodando como usuário não-root.
+-   🟢 **db**: PostgreSQL com volume nomeado para persistência de dados.
+-   🔵 **app**: API Node.js com Express e PostgreSQL, rodando como usuário não-root.
 
-## Requisitos
+---
+
+## 🎯 Requisitos
 
 -   Docker e Docker Compose instalados.
 -   Acesso a um terminal (Linux, macOS, Windows WSL).
 
-## Passo a passo com imagens
+---
 
-### 1. Clonar o repositório
+## 📋 Passo a passo com imagens
+
+### ✅ 1. Clonar o repositório
 
 ```bash
 git clone https://github.com/viniciusdurce/cp3devops.git
 cd cp3devops
 ```
 
-### 2. Build e subida dos containers
+### 🚧 2. Build e subida dos containers
 
 Execute no diretório raiz:
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 Você irá receber um output como esse no final:
-![passo1](documentacao/passo_1.png)
+
+![Containers subindo](documentacao/passo_1.png)
 
 Isto irá criar e iniciar dois containers:
 
@@ -41,11 +46,13 @@ Vamos verificar com:
 docker ps
 ```
 
-![passo2](documentacao/passo_2.png)
+![Containers em execução](documentacao/passo_2.png)
 
-### 3. Testando a API
+---
 
-## Rotas disponíveis
+### 🧪 3. Testando a API
+
+#### Rotas disponíveis
 
 | Método | Endpoint     | Descrição               |
 | ------ | ------------ | ----------------------- |
@@ -55,162 +62,160 @@ docker ps
 | PUT    | `/users/:id` | Atualiza usuário por ID |
 | DELETE | `/users/:id` | Deleta usuário por ID   |
 
-Agora vamos partir para os testes!
+#### 👩‍💻 Health check
 
--   **Health check**
-    Primeiro iremos realizar um "health check". Abra o seu api tester e cole a seguinte url:
+```bash
+http://localhost:3000/ # Utilize o metodo GET
+```
 
-        ```bash
-        http://localhost:3000/
-        # Utilizie o método GET
+![Health Check](documentacao/api_get.png)
 
-        ```
+> Retorno esperado: **DimDim App OK**
 
-    ![apiget](documentacao/api_get.png)
+#### 🚀 CRUD na rota `/users`
 
-    > Deve retornar um "DimDim App OK" como na imagem.
+-   **Criar** (_POST_): Vamos testar a api de fato. Estaremos criando um usuário com o nome Vinicius:
 
--   **CRUD na rota /users**
+    ```bash
+    http://localhost:3000/users
+    {
+      "name": "Vinicius"
+    }
+    ```
 
-    -   **Criar**: Vamos testar a api de fato. Estaremos criando um usuário com o nome "Vinicius"
+    ![Criar usuário](documentacao/api_post.png)
 
-        ```bash
-        http://localhost:3000/users # Utilize o método POST
+-   **Listar** (_GET_): Agora que criamos podemos listar ele
 
-        {
-            "name": "Vinicius"
-        }
+    ```bash
+    curl http://localhost:3000/users
+    ```
 
-        ```
+    ![Listar usuários](documentacao/api_get_users.png)
 
-    -   ![apipost](documentacao/api_post.png)
+-   **Atualizar** (_PUT_): Vamos atualizar o nome dele adicionando o sobrenome
 
-    -   **Listar**: Agora que criamos um usuario podemos listar ele
+    ```bash
+    http://localhost:3000/users/1 \
+    {
+      "name": "Vinicius Durce"
+    }
+    ```
 
-        ```bash
-        http://localhost:3000/users # Utilize o método GET
-        ```
+    ![Atualizar usuário](documentacao/api_put.png)
 
-    -   ![apigetusers](documentacao/api_get_users.png)
+    > Deve retornar status 200 OK
 
-    -   **Atualizar**:
+-   **Deletar** (_DELETE_):
 
-        ```bash
-        http://localhost:3000/users/1 # Utilize o método PUT
+    ```bash
+     http://localhost:3000/users/1
+    ```
 
-        {
-            "name": "Vinicius Durce"
-        }
-        # Não se esqueça de colocar o id do usuario na url
+    ![Deletar usuário](documentacao/api_delete.png)
 
-        ```
+*   Após deletar, liste novamente (_GET_) para confirmar exclusão(adicionei alguns usuários só pra não ficar vazio)
 
-    -   Deve retornar status 200 OK
-        ![apiput](documentacao/api_put.png)
+    ![Confirmação exclusão](documentacao/api_get_users_2.png)
 
-    -   **Deletar**: E agora para deletar é só colocar o id do usuario que deseja deletar ao fim da url (no nosso caso é o 1)
+    > Podemos ver que o usuário com id 1 (Vinicius Durce) foi excluído com sucesso!
 
-            ```bash
-            http://localhost:3000/users/1 # Utilize o método DELETE
-            ```
+---
 
-        Deve retornar 204 No Content:
-        ![apidelete](documentacao/api_delete.png)
-        E agora vamos visualizar os nossos usuarios pra ver se deu certo mesmo (adicionei mais alguns só pra não ficar tão vazio)
-        ![apigetusers2](documentacao/api_get_users_2.png)
+### 🔄 4. Validando persistência de dados
 
-        > Podemos ver que o usuario 1 (Vinicius Durce) foi excluido com sucesso!
+##### Primeiro vamos consultar os registros presentes no banco
 
-### 4. Validando persistência de dados
-
-Primeiro vamos consultar os registros presentes no banco
-
-1. Vamos acessar o psql dentro do container do DB:
+1. Acesse o psql:
 
     ```bash
     docker exec -it dimdim-db psql -U dimdim_user -d dimdim
     ```
 
-2. Listar as tabelas:
+2. Liste as tabelas:
 
     ```sql
     \dt
     ```
 
-3. Consultar os registros:
+3. Consulte os registros:
 
     ```sql
     SELECT * FROM users;
     ```
 
-4. Você deve receber um retorno como esse:
-   ![persistencia](documentacao/persistencia_banco.png)
-5. Saindo do psql:
+4. Resultado esperado:
+
+    ![Dados no banco](documentacao/persistencia_banco.png)
+
+##### Agora vamos testar a persistência dos dados de fato
+
+5. Saia do psql:
 
     ```sql
     \q
     ```
 
-6. Agora vamos parar e subir novamente os containers (mantendo o volume):
+6. Reinicie containers (mantendo volume):
 
     ```bash
     docker-compose down
     docker-compose up -d
     ```
 
-7. Entrando novamente no psql verificamos que os mesmos dados ainda existem!!
-   ![persistencia2](documentacao/persistencia_banco_3.png)
+7. Reentre no psql e confirme que os dados persistem:
 
-### 5. Inspeção dos containers
+    ![Persistência após restart](documentacao/persistencia_banco_3.png)
 
-Vamos inspecionar os containers por dentro, a começar pelo app
+---
 
-#### 5.1 Container da aplicação
+### 🔍 5. Inspeção dos containers
+
+#### 5.1 Container da aplicação (app)
 
 ```bash
-docker exec -it dimdim-app sh # Deve entrar como appuser
-
-/usr/src/app$ pwd
-/usr/src/app$ ls
-/usr/src/app$ whoami
-exit
+docker exec -it dimdim-app sh  # já entra como appuser
+whoami  # → appuser
+pwd     # → /usr/src/app
+ls      # lista arquivos da API
 ```
 
-Voce deve receber um retorno como esse:
-![containerapp](documentacao/container_app.png)
+![Container App](documentacao/container_app.png)
 
-#### 5.2 Container do banco
+#### 5.2 Container do banco (db)
 
-    ```bash
-    docker exec -it dimdim-db sh
+```bash
+docker exec -it dimdim-db sh
+whoami  # → root
+ls      # → bin  etc  var …
+pwd     # → /
+```
 
-    whoami # → root
-    ls  # → bin  etc  var …
-    pwd
+![Container DB](documentacao/container_banco.png)
 
-    ```
+> O serviço PostgreSQL roda internamente como `postgres`, garantindo segurança.
 
-![containerbanco](documentacao/container_banco.png)
-
-> Por padrão, o container do banco com o Shell vai rodar como root, mas o próprio serviço do PostgreSQL continua rodando como usuário postgres normalmente.
+---
 
 ## 🤝 Grupo
 
 <table>
   <tr>
     <td align="center">
+    <p>RM550989<p>
       <a href="https://github.com/nichol6s">
         <img src="https://avatars.githubusercontent.com/u/126689414?v=4" width="115px;" alt="Foto do Igor no GitHub"/><br>
         <sub>
-          <strong>Igor Ribeiro RM550989</strong>
+          <strong>Igor Ribeiro</strong>
         </sub>
       </a>
     </td>
     <td align="center">
+      <p>RM550427<p>
       <a href="https://github.com/VitorKubica">
         <img src="https://avatars.githubusercontent.com/u/127512951?v=4" width="115px;" alt="Foto do Durce"/><br>
         <sub>
-          <strong>Vinicius Durce RM550427</strong>
+          <strong>Vinicius Durce</strong>
         </sub>
       </a>
     </td>
